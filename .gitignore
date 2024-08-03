@@ -2,3 +2,4 @@ Generated_images
 venv
 Config.py
 .idea
+.env

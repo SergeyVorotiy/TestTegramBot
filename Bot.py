@@ -5,9 +5,14 @@ import pybase64
 import telebot
 from telebot import types
 
+from dotenv import load_dotenv
+
 import Config
 from KandinskyAPI import KandinskyAPI
 from YandexArtAPI import YandexArtAPI
+
+
+load_dotenv()
 
 
 # Создание базы данных и таблиц с запросами пользователей

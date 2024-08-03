@@ -1,18 +1,22 @@
 import json
+import os
 import time
 
 from urllib3.exceptions import HTTPError as BaseHTTPError
 
+from dotenv import load_dotenv
+
 import requests
 
-import Config
+
+load_dotenv()
 
 
 class KandinskyAPI:
 
     def __init__(self):
-        self.api_key = Config.KANDINSKY_API_KEY
-        self.secret_key = Config.KANDINSKY_SECRET_KEY
+        self.api_key = os.getenv('KANDINSKY_API_KEY')
+        self.secret_key = os.getenv('KANDINSKY_SECRET_KEY')
         self.AUTH_HEADERS = {
             'X-Key': f'Key {self.api_key}',
             'X-Secret': f'Secret {self.secret_key}',

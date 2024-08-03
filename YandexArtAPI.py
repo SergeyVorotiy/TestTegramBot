@@ -1,21 +1,28 @@
+import os
 import time
 from random import random
 
 from urllib3.exceptions import HTTPError as BaseHTTPError
+
+from dotenv import load_dotenv
 
 import requests
 
 import Config
 
 
+load_dotenv()
+
+
 class YandexArtAPI:
     def __init__(self):
 
-        self.modelURI = f'art://{Config.KATID}/yandex-art/latest'
-        self.update_iamtoken()
+        self.modelURI = f'art://{os.getenv("KATID")}/yandex-art/latest'
+
         self.AUTH_HEADERS = {
-            'Authorization': f'Bearer {Config.IAMTOKEN}',
+            'Authorization': f'Bearer token',
         }
+        self.update_iamtoken()
         rand_seed = int(random() * 10000000000)
         self.seed = f'{rand_seed}'
         self.widthRatio = 2
@@ -28,11 +35,11 @@ class YandexArtAPI:
 
     def update_iamtoken(self):
         response = requests.post('https://iam.api.cloud.yandex.net/iam/v1/tokens',
-                                 json={'yandexPassportOauthToken': Config.YAOAUTHTOKEN})
+                                 json={'yandexPassportOauthToken': os.getenv('YAOAUTHTOKEN')})
         data = response.json()
-        Config.IAMTOKEN = data['iamToken']
+        # os.seten = data['iamToken']
         self.AUTH_HEADERS = {
-            'Authorization': f'Bearer {Config.IAMTOKEN}',
+            'Authorization': f'Bearer {data["iamToken"]}',
         }
 
     def set_ratio(self, width_ratio, height_ratio):
