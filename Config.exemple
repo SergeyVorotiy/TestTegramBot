@@ -1,0 +1,6 @@
+BOT_TOKEN = '<Telegram_bot_token>'
+KANDINSKY_API_KEY = '<Kandinsky_api_key>'
+KANDINSKY_SECRET_KEY = '<Kandinsky_secret_key>'
+IAMTOKEN = '<auto_generated_iam_token>'
+KATID = '<yandex_cloud_kategory_id>'
+YAOAUTHTOKEN = '<yandex_cloud_oauth_token>'
