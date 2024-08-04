@@ -83,7 +83,6 @@ class KandinskyAPI:
             response = requests.post(self.URL + 'key/api/v1/text2image/run',
                                      headers=self.AUTH_HEADERS,
                                      files=data)
-            data = response.json()
         except BaseHTTPError:
             print('error')
         if 'uuid' in data.keys():
