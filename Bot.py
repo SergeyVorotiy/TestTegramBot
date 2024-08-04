@@ -7,10 +7,9 @@ from telebot import types
 
 from dotenv import load_dotenv
 
-import Config
+# import Config
 from KandinskyAPI import KandinskyAPI
 from YandexArtAPI import YandexArtAPI
-
 
 load_dotenv()
 
@@ -51,8 +50,8 @@ def insert_user_to_db(username, chat_id):
         db_cursor.execute('INSERT INTO Users (username, chat_id) VALUES (?, ?)', (username, chat_id))
         db_connect.commit()
     db_connect.close()
-    
-    
+
+
 # Добавление ответов от API на запросы пользователей
 def insert_response_to_db(prompt, str_image, chat_id):
     db_connect = sqlite3.connect('kandinsky_generation_db.db')
@@ -62,10 +61,10 @@ def insert_response_to_db(prompt, str_image, chat_id):
                        f'{chat_id}'))
     db_connect.commit()
     db_connect.close()
-    
-    
+
+
 # Определение глобальных переменных
-bot = telebot.TeleBot(Config.BOT_TOKEN)
+bot = telebot.TeleBot(os.getenv('BOT_TOKEN'))
 generation_model = {'model': ''}
 kandinskyAPI = KandinskyAPI()
 yaAPI = YandexArtAPI()
@@ -83,7 +82,7 @@ def start_handler(message):
         os.mkdir(f'Generated_images')
     if not os.path.isdir(f'Generated_images/{username}_{message.chat.id}'):
         os.mkdir(f'Generated_images/{username}_{message.chat.id}')
-        
+
     insert_user_to_db(username, message.chat.id)
 
     text = 'Добро пожаловать!\nНапишу картину по вашему запросу'
@@ -179,7 +178,7 @@ def generate_image(message):
             username = message.from_user.username
             if not username:
                 username = f'user_{message.chat.id}'
-            photo = open(f'Generated_images/{username}_{message.chat.id}/generatedImage{message.message_id}.jpeg', 
+            photo = open(f'Generated_images/{username}_{message.chat.id}/generatedImage{message.message_id}.jpeg',
                          'wb+')
             photo.write(image_data)
             photo.seek(0, 0)
@@ -191,7 +190,7 @@ def generate_image(message):
 
             markup = types.ReplyKeyboardMarkup()
             markup.row(types.KeyboardButton('/start'), types.KeyboardButton('Еще одну'))
-            bot.send_message(message.chat.id, 'Повторим("ещё одну?"), дополним запрос или напишем другую("/start")?', 
+            bot.send_message(message.chat.id, 'Повторим("ещё одну?"), дополним запрос или напишем другую("/start")?',
                              reply_markup=markup)
 
 
@@ -212,11 +211,10 @@ def set_yandex_ratio(message):
 
 # Установка запроса для генерации
 def set_yandex_prompt(message):
-
     if message.text == '/start':
         bot.clear_step_handler_by_chat_id(message.chat.id)
         start_handler(message)
-        return 
+        return
     else:
         if message.text == '1x1':
             yaAPI.set_ratio(1, 1)
@@ -252,7 +250,7 @@ def yandex_generate(message):
             username = message.from_user.username
             if not username:
                 username = f'user_{message.chat.id}'
-            photo = open(f'Generated_images/{username}_{message.chat.id}/generatedImage{message.message_id}.jpeg', 
+            photo = open(f'Generated_images/{username}_{message.chat.id}/generatedImage{message.message_id}.jpeg',
                          'wb+')
             photo.write(image_data)
             photo.seek(0, 0)
@@ -339,13 +337,13 @@ def text_hendler(message):
                 photo.seek(0, 0)
                 bot.send_photo(message.chat.id, photo)
                 photo.close()
-                
+
                 insert_response_to_db(kandinskyAPI.query, images[0], message.chat.id)
 
                 bot.clear_step_handler_by_chat_id(message.chat.id)
                 markup = types.ReplyKeyboardMarkup()
                 markup.row(types.KeyboardButton('/start'), types.KeyboardButton('Еще одну'))
-                bot.send_message(message.chat.id, 
+                bot.send_message(message.chat.id,
                                  'Повторим("ещё одну?"), дополним запрос или напишем другую("/start")?',
                                  reply_markup=markup)
             return
@@ -354,13 +352,13 @@ def text_hendler(message):
             markup = types.ReplyKeyboardMarkup()
             bot.clear_step_handler_by_chat_id(message.chat.id)
             markup.row(types.KeyboardButton('/start'), types.KeyboardButton('Еще одну'))
-            bot.send_message(message.chat.id, 
-                             'Cлишком большой запрос, придется начать сначала, или повторить', 
+            bot.send_message(message.chat.id,
+                             'Cлишком большой запрос, придется начать сначала, или повторить',
                              reply_markup=markup)
             return
     # Для дополнения предыдущего запроса генерации новым промптом
     elif generation_model['model'] == 'YandexArt':
-        if (yaAPI.text != '') and (len(message.text)+len(yaAPI.text) <= 500):
+        if (yaAPI.text != '') and (len(message.text) + len(yaAPI.text) <= 500):
             bot.send_message(message.chat.id, 'Генерим картинку, скоро будет готова')
             yaAPI.seed_update()
             yaAPI.text += f' {message.text}'
@@ -383,18 +381,18 @@ def text_hendler(message):
                 photo.seek(0, 0)
                 bot.send_photo(message.chat.id, photo)
                 photo.close()
-                
+
                 insert_response_to_db(yaAPI.text, image, message.chat.id)
 
                 bot.clear_step_handler_by_chat_id(message.chat.id)
                 markup = types.ReplyKeyboardMarkup()
                 markup.row(types.KeyboardButton('/start'), types.KeyboardButton('Еще одну'))
-                bot.send_message(message.chat.id, 
-                                 'Повторим("ещё одну?"), дополним запрос или напишем другую("/start")?', 
+                bot.send_message(message.chat.id,
+                                 'Повторим("ещё одну?"), дополним запрос или напишем другую("/start")?',
                                  reply_markup=markup)
                 return
         # обработчик превышения допустимого количества символов в запросе
-        elif (yaAPI.text != '') and (len(message.text)+len(yaAPI.text) > 500):
+        elif (yaAPI.text != '') and (len(message.text) + len(yaAPI.text) > 500):
             markup = types.ReplyKeyboardMarkup()
             bot.clear_step_handler_by_chat_id(message.chat.id)
             markup.row(types.KeyboardButton('/start'), types.KeyboardButton('Еще одну'))

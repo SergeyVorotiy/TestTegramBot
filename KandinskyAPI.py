@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 
 import requests
 
-
 load_dotenv()
 
 
@@ -79,10 +78,12 @@ class KandinskyAPI:
             'model_id': (None, self.model),
             'params': (None, json.dumps(params), 'application/json')
         }
+
         try:
             response = requests.post(self.URL + 'key/api/v1/text2image/run',
                                      headers=self.AUTH_HEADERS,
                                      files=data)
+            data = response.json()
         except BaseHTTPError:
             print('error')
         if 'uuid' in data.keys():

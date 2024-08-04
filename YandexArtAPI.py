@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 import requests
 
-import Config
+# import Config
 
 
 load_dotenv()
