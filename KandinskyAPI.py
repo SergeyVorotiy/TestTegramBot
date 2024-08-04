@@ -79,7 +79,6 @@ class KandinskyAPI:
             'model_id': (None, self.model),
             'params': (None, json.dumps(params), 'application/json')
         }
-        data = {}
         try:
             response = requests.post(self.URL + 'key/api/v1/text2image/run',
                                      headers=self.AUTH_HEADERS,
