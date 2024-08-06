@@ -3,3 +3,4 @@ venv
 Config.py
 .idea
 .env
+kandinsky_generation_db.db
