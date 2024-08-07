@@ -4,3 +4,5 @@ Config.py
 .idea
 .env
 kandinsky_generation_db.db
+*.db
+.DS_Store
